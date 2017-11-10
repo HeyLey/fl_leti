@@ -221,19 +221,19 @@ def make_table(grammar, first, follow):
 
         for t in term:
             rule = None
-            for r in grammar:
+            for rule_i, r in enumerate(grammar):
                 if r.lhs != nt:
                     continue
 
                 f = find_first(first, r.rhs)
 
                 if t in f:
-                    rule = r
+                    rule = rule_i
                 elif "ε" in f and t in follow[r.lhs]:
-                    rule = r
+                    rule = rule_i
 
             if rule is not None:
-                row[t] = rule.rhs
+                row[t] = rule
 
         table[nt] = row
 
@@ -280,31 +280,24 @@ def main(file):
 
     term = sorted(term) + ["$"]
 
-    to_print = [[] for i in range(len(term) + 3)]
+    for i, r in enumerate(grammar):
+        print("{} {} := {}".format(i+1, r.lhs, " ".join(r.rhs)))
 
-    to_print[0].append("N")
-    to_print[1].append("FIRST")
-    to_print[2].append("FOLLOW")
-
-    for i, t in enumerate(term):
-        to_print[i + 3].append(t)
+    print("\\begin{tabular}{ l || c | c || " + " | ".join(["c"] * len(term))+ " }")
+    print("N & FIRST & FOLLOW & " +  " & ".join(term) + " \\\\ \hline")
 
     for nt in non_term:
-        to_print[0].append(nt)
-        to_print[1].append(" ".join(sorted(first[nt])))
-        to_print[2].append(" ".join(sorted(follow[nt])))
+        print(nt + " & " + " ".join(sorted(first[nt])) + " & " + " ".join(sorted(follow[nt])), end="")
+
         for i, t in enumerate(term):
             if t in table[nt]:
-                to_print[i + 3].append(" ".join(table[nt][t]))
+                print(" & " + str(table[nt][t] + 1), end="")
             else:
-                to_print[i + 3].append("")
+                print(" & ", end="")
 
-    column_size = [max([len(v) for v in column]) for column in to_print]
+        print("\\\\")
 
-    for row in range(len(non_term) + 1):
-        for column, t in enumerate(to_print):
-            print(t[row].ljust(column_size[column]), end=" | ")
-        print()
+    print("\end{tabular}")
 
 
 if __name__ == '__main__':

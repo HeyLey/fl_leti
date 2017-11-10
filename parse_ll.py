@@ -38,7 +38,7 @@ def main(file, string):
             if string[0] not in table[first]:
                 print("Ошибка парсинга")
                 return
-            next = table[first][string[0]]
+            next = grammar[table[first][string[0]]].rhs
             if next[0] == "ε":
                 tree = tree_stack[0]
                 tree.children = ["ε"]

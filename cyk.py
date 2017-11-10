@@ -48,14 +48,18 @@ def cyk(grammar, string):
             for m in range(l):
                 for (lhs, r1, r2) in nonterminal_rules:
                     if table[r1][offset][offset + m] and table[r2][offset + m + 1][offset + l]:
-                        print(lhs, offset, offset + l)
                         table[lhs][offset][offset + l] = True
 
     for s, t in table.items():
         print("Table for {}".format(s))
-        print("  " + " ".join(string))
+        print("\\begin{tabular}{ c | " +  " ".join(["c"] * (str_len)) + " }")
+        print("  & " + " & ".join(string) + " \\\\")
+        print("\\hline")
+
         for i1 in range(str_len):
-            print(string[i1] + " " + " ".join(["+" if v else "-" for v in t[i1]]))
+            print(string[i1] + " & " + " & ".join(["+" if v else "-" for v in t[i1]]) + " \\\\")
+
+        print("\\end{tabular}")
 
     if table["S"][0][len(string) - 1]:
         print("Tree")
@@ -73,3 +77,4 @@ def main(file, string):
 
 if __name__ == '__main__':
     main(sys.argv[1], sys.argv[2])
+
